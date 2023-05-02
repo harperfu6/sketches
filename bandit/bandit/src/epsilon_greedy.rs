@@ -1,12 +1,15 @@
 use super::agent::Agent;
 use rand::prelude::*;
+use wasm_bindgen::prelude::wasm_bindgen;
 
+#[wasm_bindgen]
 pub struct EpsilonGreedy {
     epsilon: f64,
     values: Vec<f64>,
     counts: Vec<usize>,
 }
 
+#[wasm_bindgen]
 impl EpsilonGreedy {
     pub fn new(epsilon: f64, n_arms: usize) -> Self {
         Self {
@@ -14,6 +17,17 @@ impl EpsilonGreedy {
             values: vec![0.; n_arms],
             counts: vec![0; n_arms],
         }
+    }
+    pub fn reset(agent: &mut EpsilonGreedy, n_arms: usize) {
+        agent.reset(n_arms);
+    }
+
+    pub fn select_arm(agent: &EpsilonGreedy) -> usize {
+        agent.select_arm()
+    }
+
+    pub fn update(agent: &mut EpsilonGreedy, chosen_arm: usize, reward: f64) {
+        agent.update(chosen_arm, reward);
     }
 }
 
