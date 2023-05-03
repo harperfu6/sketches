@@ -21,7 +21,7 @@ fn get_opt_arms(arms: &Vec<f64>, coin_num: usize) -> Vec<usize> {
     vec![arg_max; coin_num]
 }
 
-fn is_opt_arm(selected_arms: &Vec<usize>, opt_arms: &Vec<usize>) -> Vec<usize> {
+fn is_opt_arms(selected_arms: &Vec<usize>, opt_arms: &Vec<usize>) -> Vec<usize> {
     selected_arms
         .iter()
         .zip(opt_arms.iter())
@@ -31,14 +31,15 @@ fn is_opt_arm(selected_arms: &Vec<usize>, opt_arms: &Vec<usize>) -> Vec<usize> {
 
 fn mean_axis_0(v: &Vec<Vec<usize>>) -> Vec<f64> {
     let mut mean = vec![0.; v[0].len()];
-    for i in 0..v.len() {
-        for j in 0..v[0].len() {
-            mean[j] += v[i][j] as f64;
+    for c in 0..v[0].len() {
+        for r in 0..v.len() {
+            mean[c] += v[r][c] as f64;
         }
     }
-    for i in 0..mean.len() {
-        mean[i] /= v.len() as f64;
+    for c in 0..v[0].len() {
+        mean[c] /= v.len() as f64;
     }
+
     mean
 }
 
@@ -76,7 +77,7 @@ pub fn simlation(
 fn calc_accuracy(all_selected_arms: &Vec<Vec<usize>>, opt_arms: &Vec<usize>) -> Vec<f64> {
     let is_opt_arms = all_selected_arms
         .iter()
-        .map(|selected_arms| is_opt_arm(selected_arms, opt_arms))
+        .map(|selected_arms| is_opt_arms(selected_arms, opt_arms))
         .collect::<Vec<Vec<usize>>>();
 
     mean_axis_0(&is_opt_arms)
