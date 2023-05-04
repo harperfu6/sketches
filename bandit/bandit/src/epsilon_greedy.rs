@@ -18,6 +18,11 @@ impl EpsilonGreedy {
             counts: vec![0; n_arms],
         }
     }
+
+    pub fn name(&self) -> String {
+        "EpsilonGreedy".to_string()
+    }
+
     pub fn reset(agent: &mut EpsilonGreedy, n_arms: usize) {
         agent.reset(n_arms);
     }

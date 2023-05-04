@@ -1,44 +1,10 @@
-import init, { EpsilonGreedy } from "./pkg/bandit";
+import init, { EpsilonGreedy, Random } from "./pkg/bandit";
 import { useState, useEffect } from "react";
 import { Chart as ChartJS, registerables } from "chart.js";
 import { Line } from "react-chartjs-2";
 ChartJS.register(...registerables);
 
 import "./App.css";
-
-const simulation = (
-  agent: EpsilonGreedy,
-  arms: number[],
-  sim_num: number,
-  coin_num: number,
-  setFinishSimulation: (finishSimulation: boolean) => void
-) => {
-  const allRewards = [];
-  const allSelectedArms = [];
-  for (let i = 0; i < sim_num; i++) {
-    EpsilonGreedy.reset(agent, arms.length);
-    const rewards = [];
-    const selected_arms = [];
-    for (let j = 0; j < coin_num; j++) {
-      const arm = EpsilonGreedy.select_arm(agent);
-      let reward;
-      if (Math.random() < arms[arm]) {
-        reward = 1;
-      } else {
-        reward = 0;
-      }
-      EpsilonGreedy.update(agent, arm, reward);
-
-      rewards.push(reward);
-      selected_arms.push(arm);
-    }
-    allRewards.push(rewards);
-    allSelectedArms.push(selected_arms);
-  }
-  setFinishSimulation(true);
-
-  return { allRewards, allSelectedArms };
-};
 
 const meanAxis0 = (arr: number[][]): number[] => {
   const meanArr: number[] = [];
@@ -92,33 +58,116 @@ const getOptArms = (arms: number[], coinNum: number): number[] => {
   return Array(coinNum).fill(_argMax);
 };
 
-type rewardsDict = {
-  agent: string;
-  allRewards: number[][];
+type AccuracyDict = {
+  name: string;
+  accuracyList: number[];
 };
 
-const updateRewardsDictList = (
-  rewardsDictList: rewardsDict[],
-  agent: string,
-  allRewards: number[][]
+type Agent = {
+  free: () => void;
+  reset: (agent: Agent, n: number) => void;
+  select_arm: (agent: Agent) => number;
+  update: (agent: Agent, chosen_arm: number, reward: number) => void;
+};
+
+const simulation = async (
+  agent: Agent,
+  arms: number[],
+  sim_num: number,
+  coin_num: number
 ) => {
-  const newRewardsDictList = rewardsDictList.map((rewardsDict) => {
-    if (rewardsDict.agent === agent) {
-      return { agent: agent, allRewards: allRewards };
+  if (agent) {
+    const agentName = agent.constructor.name;
+    let IAgent;
+    if (agentName === "Random") {
+      IAgent = Random;
+    } else if (agentName === "EpsilonGreedy") {
+      IAgent = EpsilonGreedy;
     } else {
-      return rewardsDict;
+      throw new Error("invalid agent name");
     }
-  });
-  return newRewardsDictList;
+
+    const allRewards = [];
+    const allSelectedArms = [];
+    for (let i = 0; i < sim_num; i++) {
+      IAgent.reset(agent, arms.length);
+      const rewards = [];
+      const selected_arms = [];
+      for (let j = 0; j < coin_num; j++) {
+        const arm = IAgent.select_arm(agent);
+        let reward;
+        if (Math.random() < arms[arm]) {
+          reward = 1;
+        } else {
+          reward = 0;
+        }
+        IAgent.update(agent, arm, reward);
+
+        rewards.push(reward);
+        selected_arms.push(arm);
+      }
+      allRewards.push(rewards);
+      allSelectedArms.push(selected_arms);
+    }
+
+    const accuracyList = calcAccuracy(
+      allSelectedArms,
+      getOptArms(arms, coin_num)
+    );
+
+    return accuracyList;
+  } else {
+    return [];
+  }
+};
+
+const simluationAll = async (
+  simlationList: Agent[],
+  isSimulation: boolean,
+  arms: number[],
+  simNum: number,
+  coinNum: number
+) => {
+  const _results = await Promise.all(
+    simlationList.map((agent) => simulation(agent, arms, simNum, coinNum))
+  );
+  const results: AccuracyDict[] = [
+    {
+      name: "random",
+      accuracyList: _results[0],
+    },
+    {
+      name: "epsilonGreedy",
+      accuracyList: _results[1],
+    },
+  ];
+  return results;
+};
+
+const makeData = (accracyDict: AccuracyDict) => {
+  const accuracyList = accracyDict.accuracyList;
+  const data = {
+    labels: accuracyList.map((_, i) => i),
+    datasets: [
+      {
+        label: accracyDict.name,
+        data: accuracyList,
+        fill: false,
+        backgroundcolor: "rgb(255, 99, 132)",
+        bordercolor: "rgba(255, 99, 132, 0.2)",
+      },
+    ],
+  };
+  return data;
 };
 
 const App = () => {
   const [loadWasm, setLoadWasmFlg] = useState(false);
-  const [finishSimulation, setFinishSimulation] = useState(false);
+  const [random, setRandom] = useState<Random>();
   const [epsilonGreedy, setEpsilonGreedy] = useState<EpsilonGreedy>();
 
-  const [rewardsDictList, setRewardsDictList] = useState<rewardsDict[]>([]);
-  const [accracyList, setAccuracyList] = useState<number[]>([]);
+  const [isSimulation, setIsSimulation] = useState(false);
+  const [accracyDictList, setAccuracyDictList] = useState<AccuracyDict[]>([]);
 
   const arms = [0.1, 0.1, 0.2, 0.3];
   const epsilon = 0.1;
@@ -129,35 +178,28 @@ const App = () => {
   useEffect(() => {
     init()
       .then(() => setLoadWasmFlg(true))
-      .then(() => setEpsilonGreedy(EpsilonGreedy.new(epsilon, arms.length)));
+      .then(() => setEpsilonGreedy(EpsilonGreedy.new(epsilon, arms.length)))
+      .then(() => setRandom(Random.new(arms.length)))
+      .then(() => setIsSimulation(true));
   });
 
+  useEffect(() => {
+    const sim = async () => {
+      const results = await simluationAll(
+        [random, epsilonGreedy],
+        isSimulation,
+        arms,
+        simNum,
+        coinNum
+      );
+      setAccuracyDictList(results);
+    };
+    sim();
+  }, [isSimulation]);
+
   if (!loadWasm) return <div>loading wasm...</div>;
-  if (epsilonGreedy === undefined) return <div>loading EpsilonGreedy...</div>;
-
-  if (!finishSimulation) {
-    const { allRewards, allSelectedArms } = simulation(
-      epsilonGreedy,
-      arms,
-      simNum,
-      coinNum,
-      setFinishSimulation
-    );
-
-    setAccuracyList(calcAccuracy(allSelectedArms, getOptArms(arms, coinNum)));
-  }
-  const data = {
-    labels: accracyList.map((_, i) => i),
-    datasets: [
-      {
-        label: "epsilongreedy",
-        data: accracyList,
-        fill: false,
-        backgroundcolor: "rgb(255, 99, 132)",
-        bordercolor: "rgba(255, 99, 132, 0.2)",
-      },
-    ],
-  };
+  if (epsilonGreedy === undefined || random === undefined)
+    return <div>loading Agents...</div>;
 
   const options = {
     responsive: true,
@@ -178,12 +220,16 @@ const App = () => {
     },
   };
 
-  if (accracyList.length === 0) return <div>calclating EpsilonGreedy...</div>;
-
   return (
     <>
-      <div style={{width:"600px", height:"600px"}}>
-        <Line data={data} options={options} />
+      <div style={{ width: "600px", height: "600px" }}>
+        {accracyDictList.map((accracyDict: AccuracyDict) => (
+          <Line
+            key={accracyDict.name}
+            data={makeData(accracyDict)}
+            options={options}
+          />
+        ))}
       </div>
     </>
   );
