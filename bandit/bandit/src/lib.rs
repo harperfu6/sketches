@@ -1,4 +1,6 @@
 mod agent;
+mod annealing_epsilon_greedy;
+mod annealing_softmax;
 mod epsilon_greedy;
 mod random;
 mod softmax;
@@ -86,8 +88,11 @@ fn calc_accuracy(all_selected_arms: &Vec<Vec<usize>>, opt_arms: &Vec<usize>) -> 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::annealing_epsilon_greedy::AnnealingEpsilonGreedy;
+    use crate::annealing_softmax::AnnealingSoftmax;
     use crate::epsilon_greedy::EpsilonGreedy;
     use crate::random::Random;
+    use crate::softmax::Softmax;
 
     use lazy_static::lazy_static;
 
@@ -111,6 +116,30 @@ mod tests {
         let epsilon = 0.1;
         let mut egreedy = EpsilonGreedy::new(epsilon, ARMS.len());
         let (all_rewards, all_selected_arms) = simlation(&mut egreedy, &ARMS, *SIM_NUM, *COIN_NUM);
+        let accuracy_list = calc_accuracy(&all_selected_arms, &OPT_ARMS);
+        println!("accuracy_list: {:?}", accuracy_list);
+    }
+
+    #[test]
+    fn test_annealing_egreedy() {
+        let mut aegreedy = AnnealingEpsilonGreedy::new(ARMS.len());
+        let (all_rewards, all_selected_arms) = simlation(&mut aegreedy, &ARMS, *SIM_NUM, *COIN_NUM);
+        let accuracy_list = calc_accuracy(&all_selected_arms, &OPT_ARMS);
+        println!("accuracy_list: {:?}", accuracy_list);
+    }
+
+    #[test]
+    fn test_softmax() {
+        let mut softmax = Softmax::new(ARMS.len());
+        let (all_rewards, all_selected_arms) = simlation(&mut softmax, &ARMS, *SIM_NUM, *COIN_NUM);
+        let accuracy_list = calc_accuracy(&all_selected_arms, &OPT_ARMS);
+        println!("accuracy_list: {:?}", accuracy_list);
+    }
+
+    #[test]
+    fn test_annealing_softmax() {
+        let mut asoftmax = AnnealingSoftmax::new(ARMS.len());
+        let (all_rewards, all_selected_arms) = simlation(&mut asoftmax, &ARMS, *SIM_NUM, *COIN_NUM);
         let accuracy_list = calc_accuracy(&all_selected_arms, &OPT_ARMS);
         println!("accuracy_list: {:?}", accuracy_list);
     }

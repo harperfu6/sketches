@@ -1,67 +1,17 @@
-import init, { EpsilonGreedy, Random } from "./pkg/bandit";
+import init, {
+  AnnealingEpsilonGreedy,
+  AnnealingSoftmax,
+  EpsilonGreedy,
+  Random,
+  Softmax,
+} from "./pkg/bandit";
 import { useState, useEffect } from "react";
 import { Chart as ChartJS, registerables } from "chart.js";
 import { Line } from "react-chartjs-2";
 ChartJS.register(...registerables);
 
+import { calcAccuracy, getOptArms, AccuracyDict } from "./utils";
 import "./App.css";
-
-const meanAxis0 = (arr: number[][]): number[] => {
-  const meanArr: number[] = [];
-  for (let c = 0; c < arr[0].length; c++) {
-    meanArr[c] = 0;
-    for (let r = 0; r < arr.length; r++) {
-      meanArr[c] += arr[r][c];
-    }
-  }
-  for (let r = 0; r < meanArr.length; r++) {
-    meanArr[r] /= arr.length;
-  }
-  return meanArr;
-};
-
-const isOptArms = (selectedArms: number[], optArms: number[]): number[] => {
-  const isOptArms = [];
-  for (let i = 0; i < selectedArms.length; i++) {
-    if (selectedArms[i] === optArms[i]) {
-      isOptArms.push(1);
-    } else {
-      isOptArms.push(0);
-    }
-  }
-  return isOptArms;
-};
-
-const calcAccuracy = (
-  allSelectedArms: number[][],
-  optArms: number[]
-): number[] => {
-  const _isOptArms: number[][] = allSelectedArms.map((selectedArms: number[]) =>
-    isOptArms(selectedArms, optArms)
-  );
-  return meanAxis0(_isOptArms);
-};
-
-const getOptArms = (arms: number[], coinNum: number): number[] => {
-  const argMax = (arr: number[]): number => {
-    let maxIndex = 0;
-    let maxValue = 0;
-    for (let i = 0; i < arr.length; i++) {
-      if (arr[i] > maxValue) {
-        maxIndex = i;
-        maxValue = arr[i];
-      }
-    }
-    return maxIndex;
-  };
-  const _argMax = argMax(arms);
-  return Array(coinNum).fill(_argMax);
-};
-
-type AccuracyDict = {
-  name: string;
-  accuracyList: number[];
-};
 
 type Agent = {
   free: () => void;
@@ -83,6 +33,12 @@ const simulation = async (
       IAgent = Random;
     } else if (agentName === "EpsilonGreedy") {
       IAgent = EpsilonGreedy;
+    } else if (agentName === "AnnealingEpsilonGreedy") {
+      IAgent = AnnealingEpsilonGreedy;
+    } else if (agentName === "Softmax") {
+      IAgent = Softmax;
+    } else if (agentName === "AnnealingSoftmax") {
+      IAgent = AnnealingSoftmax;
     } else {
       throw new Error("invalid agent name");
     }
@@ -123,7 +79,6 @@ const simulation = async (
 
 const simluationAll = async (
   simlationList: Agent[],
-  isSimulation: boolean,
   arms: number[],
   simNum: number,
   coinNum: number
@@ -139,6 +94,18 @@ const simluationAll = async (
     {
       name: "epsilonGreedy",
       accuracyList: _results[1],
+    },
+    {
+      name: "annealingEpsilonGreedy",
+      accuracyList: _results[2],
+    },
+    {
+      name: "softmax",
+      accuracyList: _results[3],
+    },
+    {
+      name: "annealingSoftmax",
+      accuracyList: _results[4],
     },
   ];
   return results;
@@ -165,6 +132,10 @@ const App = () => {
   const [loadWasm, setLoadWasmFlg] = useState(false);
   const [random, setRandom] = useState<Random>();
   const [epsilonGreedy, setEpsilonGreedy] = useState<EpsilonGreedy>();
+  const [annealingEpsilonGreedy, setAnnealingEpsilonGreedy] =
+    useState<AnnealingEpsilonGreedy>();
+  const [softmax, setSoftmax] = useState<Softmax>();
+  const [annealingSoftmax, setAnnealingSoftmax] = useState<AnnealingSoftmax>();
 
   const [isSimulation, setIsSimulation] = useState(false);
   const [accracyDictList, setAccuracyDictList] = useState<AccuracyDict[]>([]);
@@ -172,22 +143,32 @@ const App = () => {
   const arms = [0.1, 0.1, 0.2, 0.3];
   const epsilon = 0.1;
 
-  const coinNum = 100;
-  const simNum = 100;
+  const coinNum = 1000;
+  const simNum = 1000;
 
   useEffect(() => {
     init()
       .then(() => setLoadWasmFlg(true))
-      .then(() => setEpsilonGreedy(EpsilonGreedy.new(epsilon, arms.length)))
       .then(() => setRandom(Random.new(arms.length)))
+      .then(() => setEpsilonGreedy(EpsilonGreedy.new(epsilon, arms.length)))
+      .then(() =>
+        setAnnealingEpsilonGreedy(AnnealingEpsilonGreedy.new(arms.length))
+      )
+      .then(() => setSoftmax(Softmax.new(arms.length)))
+      .then(() => setAnnealingSoftmax(AnnealingSoftmax.new(arms.length)))
       .then(() => setIsSimulation(true));
   });
 
   useEffect(() => {
     const sim = async () => {
       const results = await simluationAll(
-        [random, epsilonGreedy],
-        isSimulation,
+        [
+          random,
+          epsilonGreedy,
+          annealingEpsilonGreedy,
+          softmax,
+          annealingSoftmax,
+        ],
         arms,
         simNum,
         coinNum
