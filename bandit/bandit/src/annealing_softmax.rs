@@ -20,7 +20,7 @@ impl AnnealingSoftmax {
     }
 
     pub fn name(&self) -> String {
-        format!("Softmax(tau={})", self.tau)
+        "AnnealingSoftmax".to_string()
     }
 
     pub fn reset(agent: &mut AnnealingSoftmax, n_arms: usize) {

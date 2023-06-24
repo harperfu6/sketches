@@ -20,7 +20,7 @@ impl Softmax {
     }
 
     pub fn name(&self) -> String {
-        format!("Softmax(tau={})", self.tau)
+        "Softmax".to_string()
     }
 
     pub fn reset(agent: &mut Softmax, n_arms: usize) {
