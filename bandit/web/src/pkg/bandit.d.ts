@@ -10,25 +10,18 @@ export class AnnealingEpsilonGreedy {
 */
   static new(n_arms: number): AnnealingEpsilonGreedy;
 /**
-* @returns {string}
-*/
-  name(): string;
-/**
-* @param {AnnealingEpsilonGreedy} agent
 * @param {number} n_arms
 */
-  static reset(agent: AnnealingEpsilonGreedy, n_arms: number): void;
+  call_reset(n_arms: number): void;
 /**
-* @param {AnnealingEpsilonGreedy} agent
 * @returns {number}
 */
-  static select_arm(agent: AnnealingEpsilonGreedy): number;
+  call_select_arm(): number;
 /**
-* @param {AnnealingEpsilonGreedy} agent
 * @param {number} chosen_arm
 * @param {number} reward
 */
-  static update(agent: AnnealingEpsilonGreedy, chosen_arm: number, reward: number): void;
+  call_update(chosen_arm: number, reward: number): void;
 /**
 */
   epsilon: number;
@@ -43,25 +36,18 @@ export class AnnealingSoftmax {
 */
   static new(n_arms: number): AnnealingSoftmax;
 /**
-* @returns {string}
-*/
-  name(): string;
-/**
-* @param {AnnealingSoftmax} agent
 * @param {number} n_arms
 */
-  static reset(agent: AnnealingSoftmax, n_arms: number): void;
+  call_reset(n_arms: number): void;
 /**
-* @param {AnnealingSoftmax} agent
 * @returns {number}
 */
-  static select_arm(agent: AnnealingSoftmax): number;
+  call_select_arm(): number;
 /**
-* @param {AnnealingSoftmax} agent
 * @param {number} chosen_arm
 * @param {number} reward
 */
-  static update(agent: AnnealingSoftmax, chosen_arm: number, reward: number): void;
+  call_update(chosen_arm: number, reward: number): void;
 }
 /**
 */
@@ -97,25 +83,18 @@ export class Random {
 */
   static new(n_arms: number): Random;
 /**
-* @returns {string}
-*/
-  name(): string;
-/**
-* @param {Random} agent
 * @returns {number}
 */
-  static select_arm(agent: Random): number;
+  call_select_arm(): number;
 /**
-* @param {Random} agent
 * @param {number} n_arms
 */
-  static reset(agent: Random, n_arms: number): void;
+  call_reset(n_arms: number): void;
 /**
-* @param {Random} agent
 * @param {number} chosen_arm
 * @param {number} reward
 */
-  static update(agent: Random, chosen_arm: number, reward: number): void;
+  call_update(chosen_arm: number, reward: number): void;
 }
 /**
 */
@@ -127,25 +106,18 @@ export class Softmax {
 */
   static new(n_arms: number): Softmax;
 /**
-* @returns {string}
-*/
-  name(): string;
-/**
-* @param {Softmax} agent
 * @param {number} n_arms
 */
-  static reset(agent: Softmax, n_arms: number): void;
+  call_reset(n_arms: number): void;
 /**
-* @param {Softmax} agent
 * @returns {number}
 */
-  static select_arm(agent: Softmax): number;
+  call_select_arm(): number;
 /**
-* @param {Softmax} agent
 * @param {number} chosen_arm
 * @param {number} reward
 */
-  static update(agent: Softmax, chosen_arm: number, reward: number): void;
+  call_update(chosen_arm: number, reward: number): void;
 }
 
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
@@ -156,22 +128,19 @@ export interface InitOutput {
   readonly __wbg_get_annealingepsilongreedy_epsilon: (a: number) => number;
   readonly __wbg_set_annealingepsilongreedy_epsilon: (a: number, b: number) => void;
   readonly annealingepsilongreedy_new: (a: number) => number;
-  readonly annealingepsilongreedy_name: (a: number, b: number) => void;
-  readonly annealingepsilongreedy_reset: (a: number, b: number) => void;
-  readonly annealingepsilongreedy_select_arm: (a: number) => number;
-  readonly annealingepsilongreedy_update: (a: number, b: number, c: number) => void;
+  readonly annealingepsilongreedy_call_reset: (a: number, b: number) => void;
+  readonly annealingepsilongreedy_call_select_arm: (a: number) => number;
+  readonly annealingepsilongreedy_call_update: (a: number, b: number, c: number) => void;
   readonly __wbg_annealingsoftmax_free: (a: number) => void;
   readonly annealingsoftmax_new: (a: number) => number;
-  readonly annealingsoftmax_name: (a: number, b: number) => void;
-  readonly annealingsoftmax_reset: (a: number, b: number) => void;
-  readonly annealingsoftmax_select_arm: (a: number) => number;
-  readonly annealingsoftmax_update: (a: number, b: number, c: number) => void;
+  readonly annealingsoftmax_call_reset: (a: number, b: number) => void;
+  readonly annealingsoftmax_call_select_arm: (a: number) => number;
+  readonly annealingsoftmax_call_update: (a: number, b: number, c: number) => void;
   readonly __wbg_softmax_free: (a: number) => void;
   readonly softmax_new: (a: number) => number;
-  readonly softmax_name: (a: number, b: number) => void;
-  readonly softmax_reset: (a: number, b: number) => void;
-  readonly softmax_select_arm: (a: number) => number;
-  readonly softmax_update: (a: number, b: number, c: number) => void;
+  readonly softmax_call_reset: (a: number, b: number) => void;
+  readonly softmax_call_select_arm: (a: number) => number;
+  readonly softmax_call_update: (a: number, b: number, c: number) => void;
   readonly __wbg_epsilongreedy_free: (a: number) => void;
   readonly epsilongreedy_new: (a: number, b: number) => number;
   readonly epsilongreedy_call_reset: (a: number, b: number) => void;
@@ -179,12 +148,9 @@ export interface InitOutput {
   readonly epsilongreedy_call_update: (a: number, b: number, c: number) => void;
   readonly __wbg_random_free: (a: number) => void;
   readonly random_new: (a: number) => number;
-  readonly random_name: (a: number, b: number) => void;
-  readonly random_select_arm: (a: number) => number;
-  readonly random_reset: (a: number, b: number) => void;
-  readonly random_update: (a: number, b: number, c: number) => void;
-  readonly __wbindgen_add_to_stack_pointer: (a: number) => number;
-  readonly __wbindgen_free: (a: number, b: number) => void;
+  readonly random_call_select_arm: (a: number) => number;
+  readonly random_call_reset: (a: number, b: number) => void;
+  readonly random_call_update: (a: number, b: number, c: number) => void;
   readonly __wbindgen_exn_store: (a: number) => void;
 }
 

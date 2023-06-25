@@ -13,10 +13,13 @@ ChartJS.register(...registerables);
 import { calcAccuracy, getOptArms, AccuracyDict } from "./utils";
 import "./App.css";
 
-{
-  /* type Agent = Random | EpsilonGreedy | AnnealingEpsilonGreedy | Softmax | AnnealingSoftmax | undefined; */
-}
-type Agent = EpsilonGreedy | undefined;
+type Agent =
+  | Random
+  | EpsilonGreedy
+  | AnnealingEpsilonGreedy
+  | Softmax
+  | AnnealingSoftmax
+  | undefined;
 
 const simulation = async (
   agent: Agent,
@@ -24,6 +27,7 @@ const simulation = async (
   sim_num: number,
   coin_num: number
 ) => {
+  console.log(agent);
   if (agent) {
     const allRewards = [];
     const allSelectedArms = [];
@@ -70,8 +74,24 @@ const simluationAll = async (
   );
   const results: AccuracyDict[] = [
     {
-      name: "epsilonGreedy",
+      name: "random",
       accuracyList: _results[0],
+    },
+    {
+      name: "epsilonGreedy",
+      accuracyList: _results[1],
+    },
+    {
+      name: "annealingEpsilonGreedy",
+      accuracyList: _results[2],
+    },
+    {
+      name: "softmax",
+      accuracyList: _results[3],
+    },
+    {
+      name: "annealingSoftmax",
+      accuracyList: _results[4],
     },
   ];
   return results;
@@ -128,7 +148,13 @@ const App = () => {
   useEffect(() => {
     const sim = async () => {
       const results = await simluationAll(
-        [epsilonGreedy],
+        [
+          random,
+          epsilonGreedy,
+          annealingEpsilonGreedy,
+          softmax,
+          annealingSoftmax,
+        ],
         arms,
         simNum,
         coinNum
@@ -139,14 +165,7 @@ const App = () => {
   }, [isSimulation]);
 
   if (!loadWasm) return <div>loading wasm...</div>;
-  if (
-    epsilonGreedy === undefined ||
-    random === undefined ||
-    annealingEpsilonGreedy === undefined ||
-    softmax === undefined ||
-    annealingSoftmax === undefined
-  )
-    return <div>loading Agents...</div>;
+  if (accracyDictList.length < 5) return <div>loading Agents...</div>;
 
   const options = {
     responsive: true,

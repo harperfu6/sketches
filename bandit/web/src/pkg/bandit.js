@@ -46,22 +46,6 @@ function addHeapObject(obj) {
     return idx;
 }
 
-let cachedInt32Memory0 = null;
-
-function getInt32Memory0() {
-    if (cachedInt32Memory0 === null || cachedInt32Memory0.byteLength === 0) {
-        cachedInt32Memory0 = new Int32Array(wasm.memory.buffer);
-    }
-    return cachedInt32Memory0;
-}
-
-function _assertClass(instance, klass) {
-    if (!(instance instanceof klass)) {
-        throw new Error(`expected instance of ${klass.name}`);
-    }
-    return instance.ptr;
-}
-
 function handleError(f, args) {
     try {
         return f.apply(this, args);
@@ -113,45 +97,24 @@ export class AnnealingEpsilonGreedy {
         return AnnealingEpsilonGreedy.__wrap(ret);
     }
     /**
-    * @returns {string}
-    */
-    name() {
-        try {
-            const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
-            wasm.annealingepsilongreedy_name(retptr, this.ptr);
-            var r0 = getInt32Memory0()[retptr / 4 + 0];
-            var r1 = getInt32Memory0()[retptr / 4 + 1];
-            return getStringFromWasm0(r0, r1);
-        } finally {
-            wasm.__wbindgen_add_to_stack_pointer(16);
-            wasm.__wbindgen_free(r0, r1);
-        }
-    }
-    /**
-    * @param {AnnealingEpsilonGreedy} agent
     * @param {number} n_arms
     */
-    static reset(agent, n_arms) {
-        _assertClass(agent, AnnealingEpsilonGreedy);
-        wasm.annealingepsilongreedy_reset(agent.ptr, n_arms);
+    call_reset(n_arms) {
+        wasm.annealingepsilongreedy_call_reset(this.ptr, n_arms);
     }
     /**
-    * @param {AnnealingEpsilonGreedy} agent
     * @returns {number}
     */
-    static select_arm(agent) {
-        _assertClass(agent, AnnealingEpsilonGreedy);
-        const ret = wasm.annealingepsilongreedy_select_arm(agent.ptr);
+    call_select_arm() {
+        const ret = wasm.annealingepsilongreedy_call_select_arm(this.ptr);
         return ret >>> 0;
     }
     /**
-    * @param {AnnealingEpsilonGreedy} agent
     * @param {number} chosen_arm
     * @param {number} reward
     */
-    static update(agent, chosen_arm, reward) {
-        _assertClass(agent, AnnealingEpsilonGreedy);
-        wasm.annealingepsilongreedy_update(agent.ptr, chosen_arm, reward);
+    call_update(chosen_arm, reward) {
+        wasm.annealingepsilongreedy_call_update(this.ptr, chosen_arm, reward);
     }
 }
 /**
@@ -185,45 +148,24 @@ export class AnnealingSoftmax {
         return AnnealingSoftmax.__wrap(ret);
     }
     /**
-    * @returns {string}
-    */
-    name() {
-        try {
-            const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
-            wasm.annealingsoftmax_name(retptr, this.ptr);
-            var r0 = getInt32Memory0()[retptr / 4 + 0];
-            var r1 = getInt32Memory0()[retptr / 4 + 1];
-            return getStringFromWasm0(r0, r1);
-        } finally {
-            wasm.__wbindgen_add_to_stack_pointer(16);
-            wasm.__wbindgen_free(r0, r1);
-        }
-    }
-    /**
-    * @param {AnnealingSoftmax} agent
     * @param {number} n_arms
     */
-    static reset(agent, n_arms) {
-        _assertClass(agent, AnnealingSoftmax);
-        wasm.annealingsoftmax_reset(agent.ptr, n_arms);
+    call_reset(n_arms) {
+        wasm.annealingsoftmax_call_reset(this.ptr, n_arms);
     }
     /**
-    * @param {AnnealingSoftmax} agent
     * @returns {number}
     */
-    static select_arm(agent) {
-        _assertClass(agent, AnnealingSoftmax);
-        const ret = wasm.annealingsoftmax_select_arm(agent.ptr);
+    call_select_arm() {
+        const ret = wasm.annealingsoftmax_call_select_arm(this.ptr);
         return ret >>> 0;
     }
     /**
-    * @param {AnnealingSoftmax} agent
     * @param {number} chosen_arm
     * @param {number} reward
     */
-    static update(agent, chosen_arm, reward) {
-        _assertClass(agent, AnnealingSoftmax);
-        wasm.annealingsoftmax_update(agent.ptr, chosen_arm, reward);
+    call_update(chosen_arm, reward) {
+        wasm.annealingsoftmax_call_update(this.ptr, chosen_arm, reward);
     }
 }
 /**
@@ -309,45 +251,24 @@ export class Random {
         return Random.__wrap(ret);
     }
     /**
-    * @returns {string}
-    */
-    name() {
-        try {
-            const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
-            wasm.random_name(retptr, this.ptr);
-            var r0 = getInt32Memory0()[retptr / 4 + 0];
-            var r1 = getInt32Memory0()[retptr / 4 + 1];
-            return getStringFromWasm0(r0, r1);
-        } finally {
-            wasm.__wbindgen_add_to_stack_pointer(16);
-            wasm.__wbindgen_free(r0, r1);
-        }
-    }
-    /**
-    * @param {Random} agent
     * @returns {number}
     */
-    static select_arm(agent) {
-        _assertClass(agent, Random);
-        const ret = wasm.random_select_arm(agent.ptr);
+    call_select_arm() {
+        const ret = wasm.random_call_select_arm(this.ptr);
         return ret >>> 0;
     }
     /**
-    * @param {Random} agent
     * @param {number} n_arms
     */
-    static reset(agent, n_arms) {
-        _assertClass(agent, Random);
-        wasm.random_reset(agent.ptr, n_arms);
+    call_reset(n_arms) {
+        wasm.random_call_reset(this.ptr, n_arms);
     }
     /**
-    * @param {Random} agent
     * @param {number} chosen_arm
     * @param {number} reward
     */
-    static update(agent, chosen_arm, reward) {
-        _assertClass(agent, Random);
-        wasm.random_update(agent.ptr, chosen_arm, reward);
+    call_update(chosen_arm, reward) {
+        wasm.random_call_update(this.ptr, chosen_arm, reward);
     }
 }
 /**
@@ -381,45 +302,24 @@ export class Softmax {
         return Softmax.__wrap(ret);
     }
     /**
-    * @returns {string}
-    */
-    name() {
-        try {
-            const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
-            wasm.softmax_name(retptr, this.ptr);
-            var r0 = getInt32Memory0()[retptr / 4 + 0];
-            var r1 = getInt32Memory0()[retptr / 4 + 1];
-            return getStringFromWasm0(r0, r1);
-        } finally {
-            wasm.__wbindgen_add_to_stack_pointer(16);
-            wasm.__wbindgen_free(r0, r1);
-        }
-    }
-    /**
-    * @param {Softmax} agent
     * @param {number} n_arms
     */
-    static reset(agent, n_arms) {
-        _assertClass(agent, Softmax);
-        wasm.softmax_reset(agent.ptr, n_arms);
+    call_reset(n_arms) {
+        wasm.softmax_call_reset(this.ptr, n_arms);
     }
     /**
-    * @param {Softmax} agent
     * @returns {number}
     */
-    static select_arm(agent) {
-        _assertClass(agent, Softmax);
-        const ret = wasm.softmax_select_arm(agent.ptr);
+    call_select_arm() {
+        const ret = wasm.softmax_call_select_arm(this.ptr);
         return ret >>> 0;
     }
     /**
-    * @param {Softmax} agent
     * @param {number} chosen_arm
     * @param {number} reward
     */
-    static update(agent, chosen_arm, reward) {
-        _assertClass(agent, Softmax);
-        wasm.softmax_update(agent.ptr, chosen_arm, reward);
+    call_update(chosen_arm, reward) {
+        wasm.softmax_call_update(this.ptr, chosen_arm, reward);
     }
 }
 
@@ -584,7 +484,6 @@ function initMemory(imports, maybe_memory) {
 function finalizeInit(instance, module) {
     wasm = instance.exports;
     init.__wbindgen_wasm_module = module;
-    cachedInt32Memory0 = null;
     cachedUint8Memory0 = null;
 
 

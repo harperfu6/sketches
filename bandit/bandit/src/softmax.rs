@@ -19,20 +19,16 @@ impl Softmax {
         }
     }
 
-    pub fn name(&self) -> String {
-        "Softmax".to_string()
+    pub fn call_reset(&mut self, n_arms: usize) {
+        self.reset(n_arms);
     }
 
-    pub fn reset(agent: &mut Softmax, n_arms: usize) {
-        agent.reset(n_arms);
+    pub fn call_select_arm(&self) -> usize {
+        self.select_arm()
     }
 
-    pub fn select_arm(agent: &Softmax) -> usize {
-        agent.select_arm()
-    }
-
-    pub fn update(agent: &mut Softmax, chosen_arm: usize, reward: f64) {
-        agent.update(chosen_arm, reward);
+    pub fn call_update(&mut self, chosen_arm: usize, reward: f64) {
+        self.update(chosen_arm, reward);
     }
 
     fn softmax(&self) -> Vec<f64> {
