@@ -14,13 +14,6 @@ import { calcAccuracy, getOptArms, AccuracyDict } from "./utils";
 import "./App.css";
 
 
-{/* type Agent = { */}
-{/*   free: () => void; */}
-{/*   reset: (agent: Agent, n: number) => void; */}
-{/*   select_arm: (agent: Agent) => number; */}
-{/*   update: (agent: Agent, chosen_arm: number, reward: number) => void; */}
-{/* }; */}
-
 type Agent = Random | EpsilonGreedy | AnnealingEpsilonGreedy | Softmax | AnnealingSoftmax | undefined;
 
 const simulation = async (
@@ -43,6 +36,7 @@ const simulation = async (
     } else if (agentName === "AnnealingSoftmax") {
       IAgent = AnnealingSoftmax;
     } else {
+			console.log(agentName)
       throw new Error("invalid agent name");
     }
 
