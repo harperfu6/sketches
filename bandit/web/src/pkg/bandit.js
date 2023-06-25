@@ -258,45 +258,24 @@ export class EpsilonGreedy {
         return EpsilonGreedy.__wrap(ret);
     }
     /**
-    * @returns {string}
-    */
-    name() {
-        try {
-            const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
-            wasm.epsilongreedy_name(retptr, this.ptr);
-            var r0 = getInt32Memory0()[retptr / 4 + 0];
-            var r1 = getInt32Memory0()[retptr / 4 + 1];
-            return getStringFromWasm0(r0, r1);
-        } finally {
-            wasm.__wbindgen_add_to_stack_pointer(16);
-            wasm.__wbindgen_free(r0, r1);
-        }
-    }
-    /**
-    * @param {EpsilonGreedy} agent
     * @param {number} n_arms
     */
-    static reset(agent, n_arms) {
-        _assertClass(agent, EpsilonGreedy);
-        wasm.epsilongreedy_reset(agent.ptr, n_arms);
+    call_reset(n_arms) {
+        wasm.epsilongreedy_call_reset(this.ptr, n_arms);
     }
     /**
-    * @param {EpsilonGreedy} agent
     * @returns {number}
     */
-    static select_arm(agent) {
-        _assertClass(agent, EpsilonGreedy);
-        const ret = wasm.epsilongreedy_select_arm(agent.ptr);
+    call_select_arm() {
+        const ret = wasm.epsilongreedy_call_select_arm(this.ptr);
         return ret >>> 0;
     }
     /**
-    * @param {EpsilonGreedy} agent
     * @param {number} chosen_arm
     * @param {number} reward
     */
-    static update(agent, chosen_arm, reward) {
-        _assertClass(agent, EpsilonGreedy);
-        wasm.epsilongreedy_update(agent.ptr, chosen_arm, reward);
+    call_update(chosen_arm, reward) {
+        wasm.epsilongreedy_call_update(this.ptr, chosen_arm, reward);
     }
 }
 /**

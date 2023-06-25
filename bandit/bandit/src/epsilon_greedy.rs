@@ -19,20 +19,28 @@ impl EpsilonGreedy {
         }
     }
 
-    pub fn name(&self) -> String {
-        "EpsilonGreedy".to_string()
+    // pub fn name(&self) -> String {
+    //     "EpsilonGreedy".to_string()
+    // }
+
+    pub fn call_reset(&mut self, n_arms: usize) {
+        self.reset(n_arms);
     }
 
-    pub fn reset(agent: &mut EpsilonGreedy, n_arms: usize) {
-        agent.reset(n_arms);
+    // pub fn select_arm(agent: &EpsilonGreedy) -> usize {
+    //     agent.select_arm()
+    // }
+
+    pub fn call_select_arm(&self) -> usize {
+        self.select_arm()
     }
 
-    pub fn select_arm(agent: &EpsilonGreedy) -> usize {
-        agent.select_arm()
-    }
+    // pub fn update(agent: &mut EpsilonGreedy, chosen_arm: usize, reward: f64) {
+    //     agent.update(chosen_arm, reward);
+    // }
 
-    pub fn update(agent: &mut EpsilonGreedy, chosen_arm: usize, reward: f64) {
-        agent.update(chosen_arm, reward);
+    pub fn call_update(&mut self, chosen_arm: usize, reward: f64) {
+        self.update(chosen_arm, reward);
     }
 }
 

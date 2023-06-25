@@ -13,8 +13,10 @@ ChartJS.register(...registerables);
 import { calcAccuracy, getOptArms, AccuracyDict } from "./utils";
 import "./App.css";
 
-
-type Agent = Random | EpsilonGreedy | AnnealingEpsilonGreedy | Softmax | AnnealingSoftmax | undefined;
+{
+  /* type Agent = Random | EpsilonGreedy | AnnealingEpsilonGreedy | Softmax | AnnealingSoftmax | undefined; */
+}
+type Agent = EpsilonGreedy | undefined;
 
 const simulation = async (
   agent: Agent,
@@ -23,38 +25,21 @@ const simulation = async (
   coin_num: number
 ) => {
   if (agent) {
-    const agentName = agent.constructor.name;
-    let IAgent;
-    if (agentName === "Random") {
-      IAgent = Random;
-    } else if (agentName === "EpsilonGreedy") {
-      IAgent = EpsilonGreedy;
-    } else if (agentName === "AnnealingEpsilonGreedy") {
-      IAgent = AnnealingEpsilonGreedy;
-    } else if (agentName === "Softmax") {
-      IAgent = Softmax;
-    } else if (agentName === "AnnealingSoftmax") {
-      IAgent = AnnealingSoftmax;
-    } else {
-			console.log(agentName)
-      throw new Error("invalid agent name");
-    }
-
     const allRewards = [];
     const allSelectedArms = [];
     for (let i = 0; i < sim_num; i++) {
-      IAgent.reset(agent, arms.length);
+      agent.call_reset(arms.length);
       const rewards = [];
       const selected_arms = [];
       for (let j = 0; j < coin_num; j++) {
-        const arm = IAgent.select_arm(agent);
+        const arm = agent.call_select_arm();
         let reward;
         if (Math.random() < arms[arm]) {
           reward = 1;
         } else {
           reward = 0;
         }
-        IAgent.update(agent, arm, reward);
+        agent.call_update(arm, reward);
 
         rewards.push(reward);
         selected_arms.push(arm);
@@ -85,24 +70,8 @@ const simluationAll = async (
   );
   const results: AccuracyDict[] = [
     {
-      name: "random",
-      accuracyList: _results[0],
-    },
-    {
       name: "epsilonGreedy",
-      accuracyList: _results[1],
-    },
-    {
-      name: "annealingEpsilonGreedy",
-      accuracyList: _results[2],
-    },
-    {
-      name: "softmax",
-      accuracyList: _results[3],
-    },
-    {
-      name: "annealingSoftmax",
-      accuracyList: _results[4],
+      accuracyList: _results[0],
     },
   ];
   return results;
@@ -159,13 +128,7 @@ const App = () => {
   useEffect(() => {
     const sim = async () => {
       const results = await simluationAll(
-        [
-          random,
-          epsilonGreedy,
-          annealingEpsilonGreedy,
-          softmax,
-          annealingSoftmax,
-        ],
+        [epsilonGreedy],
         arms,
         simNum,
         coinNum
@@ -176,7 +139,13 @@ const App = () => {
   }, [isSimulation]);
 
   if (!loadWasm) return <div>loading wasm...</div>;
-  if (epsilonGreedy === undefined || random === undefined)
+  if (
+    epsilonGreedy === undefined ||
+    random === undefined ||
+    annealingEpsilonGreedy === undefined ||
+    softmax === undefined ||
+    annealingSoftmax === undefined
+  )
     return <div>loading Agents...</div>;
 
   const options = {
