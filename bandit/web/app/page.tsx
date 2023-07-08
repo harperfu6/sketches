@@ -1,17 +1,19 @@
+"use client"
+
 import init, {
   AnnealingEpsilonGreedy,
   AnnealingSoftmax,
   EpsilonGreedy,
   Random,
   Softmax,
-} from "./pkg/bandit";
+} from "@/pkg/bandit";
 import { useState, useEffect } from "react";
 import { Chart as ChartJS, registerables } from "chart.js";
 import { Line } from "react-chartjs-2";
 ChartJS.register(...registerables);
 
 import { calcAccuracy, getOptArms, AccuracyDict } from "./utils";
-import "./App.css";
+{/* import "./App.css"; */}
 
 type Agent =
   | Random

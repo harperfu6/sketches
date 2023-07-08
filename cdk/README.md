@@ -1,4 +1,5 @@
 # TODO
+- node server.jsエラーが発生する(server.jsがない)エラーの解消
 - cdk で web アプリをデプロイ
   - lambda
     - web アプリを Docker(aws-lambda-adapter)に乗せる
