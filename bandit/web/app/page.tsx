@@ -14,6 +14,7 @@ import { Line } from "react-chartjs-2";
 ChartJS.register(...registerables);
 
 import { AccuracyDict } from "./utils";
+import Parameters from "./components/parameters";
 
 const makeData = (accracyDict: AccuracyDict) => {
   const accuracyList = accracyDict.accuracyList;
@@ -54,6 +55,7 @@ const options = {
 const App = () => {
   const [loadWasm, setLoadWasmFlg] = useState(false);
   const [accracyDictList, setAccuracyDictList] = useState<AccuracyDict[]>([]);
+  const [goSimulate, setGoSimulate] = useState(true);
 
   const calcList = useMemo(
     () => [
@@ -66,8 +68,8 @@ const App = () => {
     []
   );
   const arms = useMemo(() => [0.1, 0.1, 0.2, 0.3], []);
-  const coinNum = 500;
-  const simNum = 500;
+  const [coinNum, setCoinNum] = useState(100);
+  const [simNum, setSimNum] = useState(100);
 
   useEffect(() => {
     init().then(() => setLoadWasmFlg(true));
@@ -103,8 +105,11 @@ const App = () => {
       ];
       setAccuracyDictList(accuracyDictList);
     };
-    if (loadWasm) sim();
-  }, [loadWasm, calcList, arms]);
+    if (loadWasm && goSimulate) {
+      sim();
+      setGoSimulate(false);
+    }
+  }, [loadWasm, goSimulate, calcList, arms, coinNum, simNum]);
 
   if (!loadWasm) return <div>loading wasm...</div>;
   if (accracyDictList.length < calcList.length)
@@ -112,6 +117,13 @@ const App = () => {
 
   return (
     <>
+      <Parameters
+        coinNum={coinNum}
+        setCoinNum={setCoinNum}
+        simNum={simNum}
+        setSimNum={setSimNum}
+        setGoSimulate={setGoSimulate}
+      />
       <div style={{ width: "600px", height: "600px" }}>
         {accracyDictList.map((accracyDict: AccuracyDict) => (
           <Line

@@ -24,6 +24,17 @@ $ cdk deploy --profile udaiz-cdk-user
 - vite + expressだと同じくリソースの読み込みでうまくいかず(ただし上記を試す前だったので現状のCDKであればうまくいくかも)
 
 # TODO
+- 機能
+	- パラメータで選択できるようにする（modalで変更する）
+		- 各アームの個数/確率（アイコンで追加できるようにする）
+			- 現在の状態はグラフで表示
+			- 適当に生成する機能
+		- コインの数（施行数）
+		- シミュレーション数
+		- アルゴリズム
+			- パラメータ
+	- アルゴリズムごとの結果を重畳表示できるようにする
+		- 表示するグラフを選択できるようにする
 - algorithm
 	- [x] epsilon greedy
 		- [x] annealing epsilon greedy
@@ -32,10 +43,6 @@ $ cdk deploy --profile udaiz-cdk-user
 	- [ ] Thompson
 	- [ ] UCB1
 	- [ ] exp3
-- feature
-	- [ ] button for select algorithm
-	- [ ] input for sim/coin num
-
 
 # ref
 - https://github.com/DanielMorton/ratel
