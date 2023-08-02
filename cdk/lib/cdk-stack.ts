@@ -4,6 +4,7 @@ import * as lambda from "aws-cdk-lib/aws-lambda";
 import * as apigateway from "aws-cdk-lib/aws-apigateway";
 import { HttpApi } from "@aws-cdk/aws-apigatewayv2-alpha";
 import { HttpLambdaIntegration } from "@aws-cdk/aws-apigatewayv2-integrations-alpha";
+import * as iam from "aws-cdk-lib/aws-iam";
 
 export class LambdaWebStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -21,12 +22,20 @@ class LambdaDockerWebApp extends Construct {
       code: lambda.DockerImageCode.fromImageAsset("../bandit/web/"),
       memorySize: 1024,
       timeout: cdk.Duration.seconds(10),
+      environment: {
+        AWS_LAMBDA_EXEC_WRAPPER: "/opt/bootstrap",
+      },
+      role: new iam.Role(this, "DockerImageFunctionRole", {
+        assumedBy: new iam.ServicePrincipal("lambda.amazonaws.com"),
+        managedPolicies: [
+          iam.ManagedPolicy.fromAwsManagedPolicyName(
+            "service-role/AWSLambdaBasicExecutionRole"
+          ),
+        ],
+      }),
+      initialPolicy: [
+      ],
     });
-
-    // こっちだとリソースの読み込みに失敗する、、
-    // const api = new apigateway.LambdaRestApi(this, "Api", {
-    //   handler,
-    // });
 
     // https://aws.amazon.com/jp/blogs/news/developing-microservices-using-container-image-support-for-aws-lambda-and-aws-cdk/
     // 上記の記事で使われていたのがHttpApiだったので一旦こちらを使う

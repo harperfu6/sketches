@@ -55,7 +55,74 @@ const NumberInputForm: React.FC<NumberInputFormProps> = (props) => {
   );
 };
 
+type NumberArrayInputFormProps = {
+  initalValue: number;
+  maxValue: number;
+  minValue: number;
+  maxLength: number;
+  step: number;
+  inputLabel: string;
+  value: number; // 対象の配列要素の値
+  values: number[];
+  setValue: (value: number[]) => void; // 配列の値を更新する関数
+  arrayIndex: number; // setValueで更新対象とするインデックス
+};
+
+const NumberArrayInputForm: React.FC<NumberArrayInputFormProps> = (props) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.value.length > props.maxLength) {
+      return;
+    }
+    const num = parseFloat(e.target.value);
+    if (num < props.minValue) {
+      const value = parseFloat(props.minValue.toString());
+      const newValue = props.values.map((v, index) => {
+        if (index === props.arrayIndex) {
+          return value;
+        }
+        return v;
+      });
+      props.setValue(newValue);
+    } else if (num > props.maxValue) {
+      const value = parseFloat(props.maxValue.toString());
+      const newValue = props.values.map((v, index) => {
+        if (index === props.arrayIndex) {
+          return value;
+        }
+        return v;
+      });
+      props.setValue(newValue);
+    } else {
+      const value = num;
+      const newValue = props.values.map((v, index) => {
+        if (index === props.arrayIndex) {
+          return value;
+        }
+        return v;
+      });
+      props.setValue(newValue);
+    }
+  };
+
+  return (
+    <TextField
+      sx={{ mt: 2 }}
+      label={props.inputLabel}
+      variant="outlined"
+      value={props.value}
+      onChange={handleInputChange}
+      type="number"
+      inputProps={{
+        pattern: "^(0(.d+)?|1(.0+)?)$",
+        step: props.step,
+      }}
+    />
+  );
+};
+
 type SettingFormsProps = {
+  arms: number[];
+  setArms: (value: number[]) => void;
   coinNum: number;
   setCoinNum: (value: number) => void;
   simNum: number;
@@ -65,6 +132,24 @@ type SettingFormsProps = {
 const SettingForms: React.FC<SettingFormsProps> = (props) => {
   return (
     <Container>
+      <Grid container spacing={2}>
+        {props.arms.map((arm, index) => (
+          <Grid item xs={4} key={index}>
+            <NumberArrayInputForm
+              initalValue={arm}
+              maxValue={1}
+              minValue={0}
+              maxLength={3}
+              step={0.1}
+              inputLabel={`Arm${index + 1}`}
+              value={arm}
+              values={props.arms}
+              setValue={props.setArms}
+              arrayIndex={index}
+            />
+          </Grid>
+        ))}
+      </Grid>
       <Grid container spacing={2}>
         <Grid item xs={4}>
           <NumberInputForm
@@ -96,6 +181,8 @@ const SettingForms: React.FC<SettingFormsProps> = (props) => {
 };
 
 type ParametersProps = {
+  arms: number[];
+  setArms: (value: number[]) => void;
   coinNum: number;
   setCoinNum: (value: number) => void;
   simNum: number;
@@ -104,6 +191,8 @@ type ParametersProps = {
 };
 
 const Parameters: React.FC<ParametersProps> = (props) => {
+  const defaultArms = [0.1, 0.1, 0.2, 0.3];
+  const [settingArms, setSettingArms] = useState(defaultArms);
   const [settingCoinNum, setSettingCoinNum] = useState(100);
   const [settingSimNum, setSettingSimNum] = useState(100);
 
@@ -145,6 +234,8 @@ const Parameters: React.FC<ParametersProps> = (props) => {
         <DialogTitle>SETTING</DialogTitle>
         <DialogContent>
           <SettingForms
+            arms={settingArms}
+            setArms={setSettingArms}
             coinNum={settingCoinNum}
             setCoinNum={setSettingCoinNum}
             simNum={settingSimNum}
