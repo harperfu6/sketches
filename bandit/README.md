@@ -29,12 +29,11 @@ $ cdk deploy --profile udaiz-cdk-user
 		- 各アームの個数/確率（アイコンで追加できるようにする）
 			- 現在の状態はグラフで表示
 			- 適当に生成する機能
-		- コインの数（施行数）
-		- シミュレーション数
 		- アルゴリズム
 			- パラメータ
 	- アルゴリズムごとの結果を重畳表示できるようにする
 		- 表示するグラフを選択できるようにする
+	- 同じ値のarmがあるとgetOptArmの判定がうまくいかない
 - algorithm
 	- [x] epsilon greedy
 		- [x] annealing epsilon greedy

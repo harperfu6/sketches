@@ -21,6 +21,7 @@ type NumberInputFormProps = {
   setValue: (value: number) => void; // useStateの関数
 };
 
+// 1つの整数値入力フォーム
 const NumberInputForm: React.FC<NumberInputFormProps> = (props) => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.value.length > props.maxLength) {
@@ -63,11 +64,12 @@ type NumberArrayInputFormProps = {
   step: number;
   inputLabel: string;
   value: number; // 対象の配列要素の値
-  values: number[];
+  values: number[]; // 配列の値
   setValue: (value: number[]) => void; // 配列の値を更新する関数
   arrayIndex: number; // setValueで更新対象とするインデックス
 };
 
+// 複数の数値配列を管理するための入力フォーム
 const NumberArrayInputForm: React.FC<NumberArrayInputFormProps> = (props) => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.value.length > props.maxLength) {
@@ -130,11 +132,14 @@ type SettingFormsProps = {
 };
 
 const SettingForms: React.FC<SettingFormsProps> = (props) => {
+  const xs = Math.floor(12 / props.arms.length);
+
   return (
-    <Container>
+    <Container style={{ marginLeft: 0 }}>
+      <p>各腕の報酬確率</p>
       <Grid container spacing={2}>
         {props.arms.map((arm, index) => (
-          <Grid item xs={4} key={index}>
+          <Grid item xs={xs} key={index}>
             <NumberArrayInputForm
               initalValue={arm}
               maxValue={1}
@@ -151,7 +156,7 @@ const SettingForms: React.FC<SettingFormsProps> = (props) => {
         ))}
       </Grid>
       <Grid container spacing={2}>
-        <Grid item xs={4}>
+        <Grid item xs={3}>
           <NumberInputForm
             initalValue={100}
             maxValue={1000}
@@ -163,7 +168,7 @@ const SettingForms: React.FC<SettingFormsProps> = (props) => {
             setValue={props.setCoinNum}
           />
         </Grid>
-        <Grid item xs={4}>
+        <Grid item xs={3}>
           <NumberInputForm
             initalValue={100}
             maxValue={1000}
@@ -191,8 +196,8 @@ type ParametersProps = {
 };
 
 const Parameters: React.FC<ParametersProps> = (props) => {
-  const defaultArms = [0.1, 0.1, 0.2, 0.3];
-  const [settingArms, setSettingArms] = useState(defaultArms);
+  // const defaultArms = [0.1, 0.1, 0.2, 0.3];
+  const [settingArms, setSettingArms] = useState(props.arms);
   const [settingCoinNum, setSettingCoinNum] = useState(100);
   const [settingSimNum, setSettingSimNum] = useState(100);
 
@@ -207,6 +212,7 @@ const Parameters: React.FC<ParametersProps> = (props) => {
     // 前回までの値に戻す
     setSettingCoinNum(props.coinNum);
     setSettingSimNum(props.simNum);
+    setSettingArms(props.arms);
   };
 
   const onSettingSubmit = () => {
@@ -214,41 +220,106 @@ const Parameters: React.FC<ParametersProps> = (props) => {
     // 新しい値に更新
     props.setCoinNum(settingCoinNum);
     props.setSimNum(settingSimNum);
+    props.setArms(settingArms);
   };
 
   const onSimulate = () => {
+    // 新しい値に更新
+    props.setCoinNum(settingCoinNum);
+    props.setSimNum(settingSimNum);
+    props.setArms(settingArms);
+
+    // シミューレーション開始
     props.setGoSimulate(true);
   };
 
   return (
     <>
-      <p>コインの数: {props.coinNum}</p>
-      <p>シミュレーション回数: {props.simNum}</p>
-      <Button variant="outlined" onClick={onSettingOpen}>
-        Change Setting
-      </Button>
       <Button variant="outlined" onClick={onSimulate}>
         Go Simulate
       </Button>
-      <Dialog open={open}>
-        <DialogTitle>SETTING</DialogTitle>
-        <DialogContent>
-          <SettingForms
-            arms={settingArms}
-            setArms={setSettingArms}
-            coinNum={settingCoinNum}
-            setCoinNum={setSettingCoinNum}
-            simNum={settingSimNum}
-            setSimNum={setSettingSimNum}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={onSettingCancel}>Cancel</Button>
-          <Button onClick={onSettingSubmit}>Change</Button>
-        </DialogActions>
-      </Dialog>
+
+      <SettingForms
+        arms={settingArms}
+        setArms={setSettingArms}
+        coinNum={settingCoinNum}
+        setCoinNum={setSettingCoinNum}
+        simNum={settingSimNum}
+        setSimNum={setSettingSimNum}
+      />
     </>
   );
 };
 
 export default Parameters;
+
+// type ROParameterFieldProps = {
+//   arms: number[];
+//   coinNum: number;
+//   simNum: number;
+// };
+//
+// const ROParameterField: React.FC<ROParameterFieldProps> = (props) => {
+//   return (
+//     <Container sx={{ mt: 2 }}>
+//       <Grid container spacing={2}>
+//         {props.arms.map((arm, index) => (
+//           <Grid item xs={3} key={index}>
+//             <TextField
+//               id="outlined-read-only-input"
+//               label={`Arm${index + 1}`}
+//               defaultValue={arm}
+//               InputProps={{
+//                 readOnly: true,
+//               }}
+//             />
+//           </Grid>
+//         ))}
+//       </Grid>
+//       <Grid container spacing={2}>
+//         <Grid item xs={3}>
+//           <TextField
+//             id="outlined-read-only-input"
+//             label={"コインの数"}
+//             defaultValue={props.coinNum}
+//             InputProps={{
+//               readOnly: true,
+//             }}
+//           />
+//         </Grid>
+//         <Grid item xs={3}>
+//           <TextField
+//             id="outlined-read-only-input"
+//             label={"シミュレーション回数"}
+//             defaultValue={props.simNum}
+//             InputProps={{
+//               readOnly: true,
+//             }}
+//           />
+//         </Grid>
+//       </Grid>
+//     </Container>
+//   );
+// };
+
+//      <Button variant="outlined" onClick={onSettingOpen}>
+//        Change Setting
+//      </Button>
+
+//       <Dialog open={open}>
+//         <DialogTitle>SETTING</DialogTitle>
+//         <DialogContent>
+//           <SettingForms
+//             arms={settingArms}
+//             setArms={setSettingArms}
+//             coinNum={settingCoinNum}
+//             setCoinNum={setSettingCoinNum}
+//             simNum={settingSimNum}
+//             setSimNum={setSettingSimNum}
+//           />
+//         </DialogContent>
+//         <DialogActions>
+//           <Button onClick={onSettingCancel}>Cancel</Button>
+//           <Button onClick={onSettingSubmit}>Change</Button>
+//         </DialogActions>
+//       </Dialog>

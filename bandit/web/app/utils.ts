@@ -37,7 +37,7 @@ export const calcAccuracy = (
 export const getOptArms = (arms: number[], coinNum: number): number[] => {
   const argMax = (arr: number[]): number => {
     let maxIndex = 0;
-    let maxValue = 0;
+    let maxValue = arr[0];
     for (let i = 0; i < arr.length; i++) {
       if (arr[i] > maxValue) {
         maxIndex = i;

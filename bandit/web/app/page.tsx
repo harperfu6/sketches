@@ -15,6 +15,7 @@ ChartJS.register(...registerables);
 
 import { AccuracyDict } from "./utils";
 import Parameters from "./components/parameters";
+import { Grid } from "@mui/material";
 
 const makeData = (accracyDict: AccuracyDict) => {
   const accuracyList = accracyDict.accuracyList;
@@ -67,7 +68,8 @@ const App = () => {
     ],
     []
   );
-  const arms = useMemo(() => [0.1, 0.1, 0.2, 0.3], []);
+  const [arms, setArms] = useState([0.1, 0.1, 0.2, 0.3]);
+  // const [arms, setArms] = useState([1, 1, 1, 1]);
   const [coinNum, setCoinNum] = useState(100);
   const [simNum, setSimNum] = useState(100);
 
@@ -118,21 +120,25 @@ const App = () => {
   return (
     <>
       <Parameters
+        arms={arms}
+        setArms={setArms}
         coinNum={coinNum}
         setCoinNum={setCoinNum}
         simNum={simNum}
         setSimNum={setSimNum}
         setGoSimulate={setGoSimulate}
       />
-      <div style={{ width: "600px", height: "600px" }}>
+      <Grid container spacing={3} style={{margin: '10px'}}>
         {accracyDictList.map((accracyDict: AccuracyDict) => (
-          <Line
-            key={accracyDict.name}
-            data={makeData(accracyDict)}
-            options={options}
-          />
+          <Grid item xs={5} key={accracyDict.name}>
+            <Line
+              key={accracyDict.name}
+              data={makeData(accracyDict)}
+              options={options}
+            />
+          </Grid>
         ))}
-      </div>
+      </Grid>
     </>
   );
 };
