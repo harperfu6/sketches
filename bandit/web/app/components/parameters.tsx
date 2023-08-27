@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useContext } from "react";
 import {
   Button,
   TextField,
@@ -11,8 +11,16 @@ import {
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
+import { AppContext } from "../page";
+import { calcAnnealingEpsilonGreedy, calcEpsilonGreedy } from "../simulation";
+
+enum NumberType {
+  INT,
+  FLOAT,
+}
 
 type NumberInputFormProps = {
+  numberType: NumberType;
   initalValue: number;
   maxValue: number;
   minValue: number;
@@ -29,33 +37,64 @@ const NumberInputForm: React.FC<NumberInputFormProps> = (props) => {
     if (e.target.value.length > props.maxLength) {
       return;
     }
-    const num = parseInt(e.target.value);
+
+    let num;
+    if (props.numberType === NumberType.INT) {
+      num = parseInt(e.target.value);
+    } else {
+      num = parseFloat(e.target.value);
+    }
     if (num < props.minValue) {
-      props.setValue(parseInt(props.minValue.toString()));
+      if (props.numberType === NumberType.INT) {
+        props.setValue(parseInt(props.minValue.toString()));
+      } else {
+        props.setValue(parseFloat(props.minValue.toString()));
+      }
       return;
     } else if (num > props.maxValue) {
-      props.setValue(parseInt(props.maxValue.toString()));
+      if (props.numberType === NumberType.INT) {
+        props.setValue(parseInt(props.maxValue.toString()));
+      } else {
+        props.setValue(parseFloat(props.maxValue.toString()));
+      }
       return;
     } else {
       props.setValue(num);
     }
   };
 
-  return (
-    <TextField
-      sx={{ mt: 2 }}
-      label={props.inputLabel}
-      variant="outlined"
-      value={props.value}
-      onChange={handleInputChange}
-      type="number"
-      inputProps={{
-        inputMode: "numeric",
-        pattern: "[0-9]*",
-        step: props.step,
-      }}
-    />
-  );
+  if (props.numberType === NumberType.INT) {
+    return (
+      <TextField
+        sx={{ mt: 2 }}
+        label={props.inputLabel}
+        variant="outlined"
+        value={props.value}
+        onChange={handleInputChange}
+        type="number"
+        inputProps={{
+          inputMode: "numeric",
+          pattern: "[0-9]*",
+          step: props.step,
+        }}
+      />
+    );
+  } else {
+    return (
+      <TextField
+        sx={{ mt: 2 }}
+        label={props.inputLabel}
+        variant="outlined"
+        value={props.value}
+        onChange={handleInputChange}
+        type="number"
+        inputProps={{
+          pattern: "^(0(.d+)?|1(.0+)?)$",
+          step: props.step,
+        }}
+      />
+    );
+  }
 };
 
 type NumberArrayInputFormProps = {
@@ -139,6 +178,8 @@ type SettingFormsProps = {
   setCoinNum: (value: number) => void;
   simNum: number;
   setSimNum: (value: number) => void;
+  epsilon: number;
+  setEpsilon: (value: number) => void;
 };
 
 const SettingForms: React.FC<SettingFormsProps> = (props) => {
@@ -190,6 +231,7 @@ const SettingForms: React.FC<SettingFormsProps> = (props) => {
       <Grid container spacing={2}>
         <Grid item xs={2}>
           <NumberInputForm
+            numberType={NumberType.INT}
             initalValue={100}
             maxValue={1000}
             minValue={1}
@@ -202,6 +244,7 @@ const SettingForms: React.FC<SettingFormsProps> = (props) => {
         </Grid>
         <Grid item xs={2}>
           <NumberInputForm
+            numberType={NumberType.INT}
             initalValue={100}
             maxValue={1000}
             minValue={1}
@@ -210,6 +253,19 @@ const SettingForms: React.FC<SettingFormsProps> = (props) => {
             inputLabel="シミュレーション回数"
             value={props.simNum}
             setValue={props.setSimNum}
+          />
+        </Grid>
+        <Grid item xs={2}>
+          <NumberInputForm
+            numberType={NumberType.FLOAT}
+            initalValue={0.1}
+            maxValue={1}
+            minValue={0}
+            maxLength={3}
+            step={0.1}
+            inputLabel="epsilon"
+            value={props.epsilon}
+            setValue={props.setEpsilon}
           />
         </Grid>
       </Grid>
@@ -231,12 +287,29 @@ const Parameters: React.FC<ParametersProps> = (props) => {
   const [settingArms, setSettingArms] = useState(props.arms);
   const [settingCoinNum, setSettingCoinNum] = useState(100);
   const [settingSimNum, setSettingSimNum] = useState(100);
+  const [settingEpsilon, setSettingEpsilon] = useState(1.0);
+
+  const {
+    epsilon,
+    setEpsilon,
+    _calcRandom,
+    setCalcRandom,
+    _calcEpsilonGreedy,
+    setCalcEpsilonGreedy,
+    _calcAnnealingEpsilonGreedy,
+    setCalcAnnealingEpsilonGreedy,
+    _calcSoftmax,
+    setCalcSoftmax,
+    _calcAnnealingSoftmax,
+    setCalcAnnealingSoftmax,
+  } = useContext(AppContext);
 
   const onSettingDefault = () => {
     // 前回までの値に戻す
     setSettingCoinNum(props.coinNum);
     setSettingSimNum(props.simNum);
     setSettingArms(props.arms);
+    setSettingEpsilon(epsilon);
   };
 
   const onSimulate = () => {
@@ -244,6 +317,9 @@ const Parameters: React.FC<ParametersProps> = (props) => {
     props.setCoinNum(settingCoinNum);
     props.setSimNum(settingSimNum);
     props.setArms(settingArms);
+    setEpsilon(settingEpsilon);
+    setCalcEpsilonGreedy(calcEpsilonGreedy(settingEpsilon));
+    setCalcAnnealingEpsilonGreedy(calcAnnealingEpsilonGreedy(settingEpsilon));
 
     // シミューレーション開始
     props.setGoSimulate(true);
@@ -266,6 +342,8 @@ const Parameters: React.FC<ParametersProps> = (props) => {
         setCoinNum={setSettingCoinNum}
         simNum={settingSimNum}
         setSimNum={setSettingSimNum}
+        epsilon={settingEpsilon}
+        setEpsilon={setSettingEpsilon}
       />
     </>
   );

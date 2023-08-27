@@ -7,15 +7,17 @@ pub struct AnnealingEpsilonGreedy {
     pub epsilon: f64,
     values: Vec<f64>,
     counts: Vec<usize>,
+    default_epsilon: f64,
 }
 
 #[wasm_bindgen]
 impl AnnealingEpsilonGreedy {
-    pub fn new(n_arms: usize) -> Self {
+    pub fn new(epsilon: f64, n_arms: usize) -> Self {
         Self {
-            epsilon: 1.0,
+            epsilon,
             values: vec![0.; n_arms],
             counts: vec![0; n_arms],
+            default_epsilon: epsilon,
         }
     }
 
@@ -34,7 +36,7 @@ impl AnnealingEpsilonGreedy {
 
 impl Agent for AnnealingEpsilonGreedy {
     fn reset(&mut self, n_arms: usize) {
-        self.epsilon = 1.0;
+        self.epsilon = self.default_epsilon;
         self.values = vec![0.; n_arms];
         self.counts = vec![0; n_arms];
     }

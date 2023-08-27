@@ -3,5 +3,5 @@ description = "wasm pack"
 script = [
 	"wasm-pack build --target web bandit",
 	"rm -rf web/src/pkg",
-	"cp -r bandit/pkg web/src/",
+	"cp -r bandit/pkg web/",
 ]

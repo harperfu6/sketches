@@ -7,7 +7,7 @@ import {
 } from "@/pkg/bandit";
 import { calcAccuracy, getOptArms, AccuracyDict } from "@/app/utils";
 
-export const calcRandom = async (
+export const calcRandom = () => async (
   arms: number[],
   coinNum: number,
   simNum: number
@@ -17,23 +17,22 @@ export const calcRandom = async (
   return accuracyList;
 };
 
-export const calcEpsilonGreedy = async (
+export const calcEpsilonGreedy = (epsilon: number) => () => async (
   arms: number[],
   coinNum: number,
   simNum: number
 ) => {
-  const epsilon = 0.1;
   const epsilonGreedy = EpsilonGreedy.new(epsilon, arms.length);
   const accuracyList = await simulation(epsilonGreedy, arms, simNum, coinNum);
   return accuracyList;
 };
 
-export const calcAnnealingEpsilonGreedy = async (
+export const calcAnnealingEpsilonGreedy = (epsilon: number) => () => async (
   arms: number[],
   coinNum: number,
   simNum: number
 ) => {
-  const annealingEpsilonGreedy = AnnealingEpsilonGreedy.new(arms.length);
+  const annealingEpsilonGreedy = AnnealingEpsilonGreedy.new(epsilon, arms.length);
   const accuracyList = await simulation(
     annealingEpsilonGreedy,
     arms,
@@ -43,7 +42,7 @@ export const calcAnnealingEpsilonGreedy = async (
   return accuracyList;
 };
 
-export const calcSoftmax = async (
+export const calcSoftmax = () => async (
   arms: number[],
   coinNum: number,
   simNum: number
@@ -53,7 +52,7 @@ export const calcSoftmax = async (
   return accuracyList;
 };
 
-export const calcAnnealingSoftmax = async (
+export const calcAnnealingSoftmax = () => async (
   arms: number[],
   coinNum: number,
   simNum: number
@@ -68,7 +67,7 @@ export const calcAnnealingSoftmax = async (
   return accuracyList;
 };
 
-type Agent =
+export type Agent =
   | Random
   | EpsilonGreedy
   | AnnealingEpsilonGreedy

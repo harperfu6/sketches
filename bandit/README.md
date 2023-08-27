@@ -25,11 +25,6 @@ $ cdk deploy --profile udaiz-cdk-user
 
 # TODO
 - 機能
-	- パラメータで選択できるようにする
-		- アルゴリズム
-			- パラメータ
-	- アルゴリズムごとの結果を重畳表示できるようにする
-		- 表示するグラフを選択できるようにする
 	- 同じ値のarmがあるとgetOptArmの判定がうまくいかないのを修正
 - algorithm
 	- [x] epsilon greedy
