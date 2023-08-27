@@ -25,15 +25,12 @@ $ cdk deploy --profile udaiz-cdk-user
 
 # TODO
 - 機能
-	- パラメータで選択できるようにする（modalで変更する）
-		- 各アームの個数/確率（アイコンで追加できるようにする）
-			- 現在の状態はグラフで表示
-			- 適当に生成する機能
+	- パラメータで選択できるようにする
 		- アルゴリズム
 			- パラメータ
 	- アルゴリズムごとの結果を重畳表示できるようにする
 		- 表示するグラフを選択できるようにする
-	- 同じ値のarmがあるとgetOptArmの判定がうまくいかない
+	- 同じ値のarmがあるとgetOptArmの判定がうまくいかないのを修正
 - algorithm
 	- [x] epsilon greedy
 		- [x] annealing epsilon greedy

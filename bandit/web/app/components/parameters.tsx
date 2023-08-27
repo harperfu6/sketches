@@ -9,6 +9,8 @@ import {
   DialogContent,
   DialogActions,
 } from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
+import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
 
 type NumberInputFormProps = {
   initalValue: number;
@@ -67,6 +69,7 @@ type NumberArrayInputFormProps = {
   values: number[]; // 配列の値
   setValue: (value: number[]) => void; // 配列の値を更新する関数
   arrayIndex: number; // setValueで更新対象とするインデックス
+  onClickRemove: () => void;
 };
 
 // 複数の数値配列を管理するための入力フォーム
@@ -107,18 +110,25 @@ const NumberArrayInputForm: React.FC<NumberArrayInputFormProps> = (props) => {
   };
 
   return (
-    <TextField
-      sx={{ mt: 2 }}
-      label={props.inputLabel}
-      variant="outlined"
-      value={props.value}
-      onChange={handleInputChange}
-      type="number"
-      inputProps={{
-        pattern: "^(0(.d+)?|1(.0+)?)$",
-        step: props.step,
-      }}
-    />
+    <>
+      <RemoveCircleIcon
+        sx={{ position: "relative", top: "10%", left: "0%" }}
+        style={{ fill: "gray" }}
+        onClick={props.onClickRemove}
+      />
+      <TextField
+        sx={{ mt: 2 }}
+        label={props.inputLabel}
+        variant="outlined"
+        value={props.value}
+        onChange={handleInputChange}
+        type="number"
+        inputProps={{
+          pattern: "^(0(.d+)?|1(.0+)?)$",
+          step: props.step,
+        }}
+      />
+    </>
   );
 };
 
@@ -134,29 +144,51 @@ type SettingFormsProps = {
 const SettingForms: React.FC<SettingFormsProps> = (props) => {
   const xs = Math.floor(12 / props.arms.length);
 
+  const onClickAddArm = () => {
+    const newArms = props.arms.concat([0.5]);
+    props.setArms(newArms);
+  };
+
+  const onClickRemoveArm = (index: number) => () => {
+    const newArms = props.arms.filter((_, i) => i !== index);
+    props.setArms(newArms);
+  };
+
   return (
-    <Container style={{ marginLeft: 0 }}>
+    <Container style={{ margin: "20px" }}>
       <p>各腕の報酬確率</p>
-      <Grid container spacing={2}>
-        {props.arms.map((arm, index) => (
-          <Grid item xs={xs} key={index}>
-            <NumberArrayInputForm
-              initalValue={arm}
-              maxValue={1}
-              minValue={0}
-              maxLength={3}
-              step={0.1}
-              inputLabel={`Arm${index + 1}`}
-              value={arm}
-              values={props.arms}
-              setValue={props.setArms}
-              arrayIndex={index}
-            />
+      <Grid container spacing={1}>
+        <Grid item xs={11}>
+          <Grid container spacing={1}>
+            {props.arms.map((arm, index) => (
+              <Grid item xs={xs} key={index}>
+                <NumberArrayInputForm
+                  initalValue={arm}
+                  maxValue={1}
+                  minValue={0}
+                  maxLength={3}
+                  step={0.1}
+                  inputLabel={`Arm${index + 1}`}
+                  value={arm}
+                  values={props.arms}
+                  setValue={props.setArms}
+                  arrayIndex={index}
+                  onClickRemove={onClickRemoveArm(index)}
+                />
+              </Grid>
+            ))}
           </Grid>
-        ))}
+        </Grid>
+        <Grid item xs={1}>
+          <AddIcon
+            sx={{ mt: "50%" }}
+            style={{ fill: "gray" }}
+            onClick={onClickAddArm}
+          />
+        </Grid>
       </Grid>
       <Grid container spacing={2}>
-        <Grid item xs={3}>
+        <Grid item xs={2}>
           <NumberInputForm
             initalValue={100}
             maxValue={1000}
@@ -168,7 +200,7 @@ const SettingForms: React.FC<SettingFormsProps> = (props) => {
             setValue={props.setCoinNum}
           />
         </Grid>
-        <Grid item xs={3}>
+        <Grid item xs={2}>
           <NumberInputForm
             initalValue={100}
             maxValue={1000}
@@ -196,31 +228,15 @@ type ParametersProps = {
 };
 
 const Parameters: React.FC<ParametersProps> = (props) => {
-  // const defaultArms = [0.1, 0.1, 0.2, 0.3];
   const [settingArms, setSettingArms] = useState(props.arms);
   const [settingCoinNum, setSettingCoinNum] = useState(100);
   const [settingSimNum, setSettingSimNum] = useState(100);
 
-  const [open, setOpen] = useState(false);
-
-  const onSettingOpen = () => {
-    setOpen(true);
-  };
-
-  const onSettingCancel = () => {
-    setOpen(false);
+  const onSettingDefault = () => {
     // 前回までの値に戻す
     setSettingCoinNum(props.coinNum);
     setSettingSimNum(props.simNum);
     setSettingArms(props.arms);
-  };
-
-  const onSettingSubmit = () => {
-    setOpen(false);
-    // 新しい値に更新
-    props.setCoinNum(settingCoinNum);
-    props.setSimNum(settingSimNum);
-    props.setArms(settingArms);
   };
 
   const onSimulate = () => {
@@ -235,8 +251,12 @@ const Parameters: React.FC<ParametersProps> = (props) => {
 
   return (
     <>
-      <Button variant="outlined" onClick={onSimulate}>
-        Go Simulate
+      <Button variant="contained" onClick={onSimulate}>
+        Simulate
+      </Button>
+
+      <Button variant="outlined" onClick={onSettingDefault}>
+        default parameters
       </Button>
 
       <SettingForms
@@ -252,74 +272,3 @@ const Parameters: React.FC<ParametersProps> = (props) => {
 };
 
 export default Parameters;
-
-// type ROParameterFieldProps = {
-//   arms: number[];
-//   coinNum: number;
-//   simNum: number;
-// };
-//
-// const ROParameterField: React.FC<ROParameterFieldProps> = (props) => {
-//   return (
-//     <Container sx={{ mt: 2 }}>
-//       <Grid container spacing={2}>
-//         {props.arms.map((arm, index) => (
-//           <Grid item xs={3} key={index}>
-//             <TextField
-//               id="outlined-read-only-input"
-//               label={`Arm${index + 1}`}
-//               defaultValue={arm}
-//               InputProps={{
-//                 readOnly: true,
-//               }}
-//             />
-//           </Grid>
-//         ))}
-//       </Grid>
-//       <Grid container spacing={2}>
-//         <Grid item xs={3}>
-//           <TextField
-//             id="outlined-read-only-input"
-//             label={"コインの数"}
-//             defaultValue={props.coinNum}
-//             InputProps={{
-//               readOnly: true,
-//             }}
-//           />
-//         </Grid>
-//         <Grid item xs={3}>
-//           <TextField
-//             id="outlined-read-only-input"
-//             label={"シミュレーション回数"}
-//             defaultValue={props.simNum}
-//             InputProps={{
-//               readOnly: true,
-//             }}
-//           />
-//         </Grid>
-//       </Grid>
-//     </Container>
-//   );
-// };
-
-//      <Button variant="outlined" onClick={onSettingOpen}>
-//        Change Setting
-//      </Button>
-
-//       <Dialog open={open}>
-//         <DialogTitle>SETTING</DialogTitle>
-//         <DialogContent>
-//           <SettingForms
-//             arms={settingArms}
-//             setArms={setSettingArms}
-//             coinNum={settingCoinNum}
-//             setCoinNum={setSettingCoinNum}
-//             simNum={settingSimNum}
-//             setSimNum={setSettingSimNum}
-//           />
-//         </DialogContent>
-//         <DialogActions>
-//           <Button onClick={onSettingCancel}>Cancel</Button>
-//           <Button onClick={onSettingSubmit}>Change</Button>
-//         </DialogActions>
-//       </Dialog>
