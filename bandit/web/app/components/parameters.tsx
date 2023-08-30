@@ -11,8 +11,9 @@ import {
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
-import { AppContext } from "../page";
+import { AppContext } from "../context";
 import { calcAnnealingEpsilonGreedy, calcEpsilonGreedy } from "../simulation";
+import {defaultArms, defaultCoinNum, defaultEpsilon, defaultSimNum} from "../const";
 
 enum NumberType {
   INT,
@@ -306,10 +307,10 @@ const Parameters: React.FC<ParametersProps> = (props) => {
 
   const onSettingDefault = () => {
     // 前回までの値に戻す
-    setSettingCoinNum(props.coinNum);
-    setSettingSimNum(props.simNum);
-    setSettingArms(props.arms);
-    setSettingEpsilon(epsilon);
+    setSettingCoinNum(defaultCoinNum);
+    setSettingSimNum(defaultSimNum);
+    setSettingArms(defaultArms);
+    setSettingEpsilon(defaultEpsilon);
   };
 
   const onSimulate = () => {

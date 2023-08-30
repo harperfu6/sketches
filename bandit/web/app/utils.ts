@@ -12,10 +12,13 @@ export const meanAxis0 = (arr: number[][]): number[] => {
   return meanArr;
 };
 
-const isOptArms = (selectedArms: number[], optArms: number[]): number[] => {
+const isOptArms = (
+  selectedArms: number[],
+  optArms: number[][] // [armCandidates][coinNum]
+): number[] => {
   const isOptArms = [];
   for (let i = 0; i < selectedArms.length; i++) {
-    if (selectedArms[i] === optArms[i]) {
+    if (optArms[i].includes(selectedArms[i])) {
       isOptArms.push(1);
     } else {
       isOptArms.push(0);
@@ -25,8 +28,8 @@ const isOptArms = (selectedArms: number[], optArms: number[]): number[] => {
 };
 
 export const calcAccuracy = (
-  allSelectedArms: number[][],
-  optArms: number[]
+  allSelectedArms: number[][], // [simNum][coinNum]
+  optArms: number[][] // [armCandidates][coinNum]
 ): number[] => {
   const _isOptArms: number[][] = allSelectedArms.map((selectedArms: number[]) =>
     isOptArms(selectedArms, optArms)
@@ -34,24 +37,25 @@ export const calcAccuracy = (
   return meanAxis0(_isOptArms);
 };
 
-export const getOptArms = (arms: number[], coinNum: number): number[] => {
-  const argMax = (arr: number[]): number => {
-    let maxIndex = 0;
+export const getOptArms = (arms: number[], coinNum: number): number[][] => {
+  const argMaxes = (arr: number[]): number[] => {
+    let maxIndexes = [0];
     let maxValue = arr[0];
-    for (let i = 0; i < arr.length; i++) {
+    for (let i = 1; i < arr.length; i++) {
       if (arr[i] > maxValue) {
-        maxIndex = i;
+        maxIndexes = [i];
         maxValue = arr[i];
+      } else if (arr[i] === maxValue) {
+        maxIndexes.push(i);
       }
     }
-    return maxIndex;
+    return maxIndexes;
   };
-  const _argMax = argMax(arms);
-  return Array(coinNum).fill(_argMax);
+  const _argMaxes = argMaxes(arms);
+  return Array(coinNum).fill(_argMaxes);
 };
 
 export type AccuracyDict = {
   name: string;
   accuracyList: number[];
 };
-

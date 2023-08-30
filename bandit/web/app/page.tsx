@@ -8,7 +8,14 @@ import {
   calcRandom,
   calcSoftmax,
 } from "./simulation/";
-import { useState, useEffect, useMemo, createContext, Dispatch, SetStateAction } from "react";
+import {
+  useState,
+  useEffect,
+  useMemo,
+  createContext,
+  Dispatch,
+  SetStateAction,
+} from "react";
 import { Chart as ChartJS, registerables } from "chart.js";
 import { Line } from "react-chartjs-2";
 ChartJS.register(...registerables);
@@ -16,6 +23,8 @@ ChartJS.register(...registerables);
 import { AccuracyDict } from "./utils";
 import Parameters from "./components/parameters";
 import { Grid } from "@mui/material";
+import {AppContext} from "./context";
+import {defaultArms, defaultCoinNum, defaultEpsilon, defaultSimNum} from "./const";
 
 const makeData = (accracyDict: AccuracyDict) => {
   const accuracyList = accracyDict.accuracyList;
@@ -53,39 +62,15 @@ const options = {
   },
 };
 
-type ModelSig = (
-  arms: number[],
-  coinNum: number,
-  simNum: number
-) => Promise<number[]>;
-
-export const AppContext = createContext(
-  {} as {
-    epsilon: number;
-    setEpsilon: Dispatch<SetStateAction<number>>;
-    _calcRandom: ModelSig;
-    setCalcRandom: Dispatch<SetStateAction<ModelSig>>;
-    _calcEpsilonGreedy: ModelSig;
-    setCalcEpsilonGreedy: Dispatch<SetStateAction<ModelSig>>;
-    _calcAnnealingEpsilonGreedy: ModelSig;
-    setCalcAnnealingEpsilonGreedy: Dispatch<SetStateAction<ModelSig>>;
-    _calcSoftmax: ModelSig;
-    setCalcSoftmax: Dispatch<SetStateAction<ModelSig>>;
-    _calcAnnealingSoftmax: ModelSig;
-    setCalcAnnealingSoftmax: Dispatch<SetStateAction<ModelSig>>; 
-  }
-);
-
 const App = () => {
   const [loadWasm, setLoadWasmFlg] = useState(false);
   const [accracyDictList, setAccuracyDictList] = useState<AccuracyDict[]>([]);
   const [goSimulate, setGoSimulate] = useState(true);
 
-  const [arms, setArms] = useState([0.1, 0.1, 0.2, 0.3]);
-  // const [arms, setArms] = useState([1, 1, 1, 1]);
-  const [coinNum, setCoinNum] = useState(100);
-  const [simNum, setSimNum] = useState(100);
-  const [epsilon, setEpsilon] = useState(1.0);
+  const [arms, setArms] = useState(defaultArms);
+  const [coinNum, setCoinNum] = useState(defaultCoinNum);
+  const [simNum, setSimNum] = useState(defaultSimNum);
+  const [epsilon, setEpsilon] = useState(defaultEpsilon);
 
   const [_calcRandom, setCalcRandom] = useState(calcRandom);
   const [_calcEpsilonGreedy, setCalcEpsilonGreedy] = useState(
@@ -104,7 +89,7 @@ const App = () => {
 
   useEffect(() => {
     const sim = async () => {
-			console.log(epsilon);
+      console.log(epsilon);
       const _results = await Promise.all([
         _calcRandom(arms, coinNum, simNum),
         _calcEpsilonGreedy(arms, coinNum, simNum),
@@ -144,6 +129,7 @@ const App = () => {
   }, [
     loadWasm,
     goSimulate,
+    epsilon,
     _calcRandom,
     _calcEpsilonGreedy,
     _calcAnnealingEpsilonGreedy,
